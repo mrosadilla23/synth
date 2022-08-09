@@ -62,7 +62,7 @@ const Synth = () => {
 
 
   //defining midi function
-  let midi = null;  // global MIDIAccess object
+  let midi = null;  // global  MIDIAccess object
   function onMIDISuccess(midiAccess) {
     console.log("MIDI ready!");
     midi = midiAccess;  // store in the global (in real usage, would probably keep in an object instance)
