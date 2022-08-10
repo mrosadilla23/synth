@@ -11,3 +11,80 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+.keyboard {
+  user-select: none;
+  top: 0;
+  left: 0;
+  min-width: 600px;
+  width: 100%;
+  max-width: 780px;
+  height: 300px;
+  background-color: green;
+  color: #fff;
+  font-size: 1.2em;
+  text-align: center;
+  line-height: 1.5;
+  font-family: 'Courier New', Courier, monospace;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+
+
+}
+
+.white {
+  position: relative;
+  background-color: #fff;
+  color : #000;
+  border: #000 3px solid;
+  width: 22%;
+}
+ .black {
+  position: relative;
+  background-color: #000;
+  color : #fff;
+  z-index: 2;
+  width: 8%;
+  height: 60%;
+  margin-left: -20px;
+  margin-right: -20px;
+  justify-self: center;
+
+}
+.null {
+display: none;
+}
+.key.pressed {
+  background-color: grey;
+  color: #000;
+}
+.control {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  top: 0;
+  width: 20%;
+  height: 200px;
+  background-color: #000;
+  opacity: 0.5;
+  color: #fff;
+  padding: 10px;
+}
+.controls {
+  min-width: 600px;
+  width: 100%;
+  max-width: 780px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+.synth {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
