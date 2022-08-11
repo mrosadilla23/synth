@@ -1,35 +1,41 @@
-import React from "react";
+import React, {useState} from "react";
 
-const Controls = ({ handleDetune, handlePortamento, handleVolume, handleWaveType, handleRelease, handleAttack, handleSustain, handleDecay }) => {
+const Controls = ({midi,startMidi, stopMidi ,settings, setSettings , handleDetune, handlePortamento, handleVolume, handleWaveType, handleRelease, handleAttack, handleSustain, handleDecay }) => {
+
   return (
+
     <div className="controls">
-      <div className="control">
+      <fieldset className="control" >
+      <legend>Controls</legend>
+      <div>
         <label>WaveForm</label>
-        <select onChange={handleWaveType}>
+        <select value={settings.type} onChange={handleWaveType}>
           <option value="sine">sine</option>
           <option value="sawtooth">sawtooth</option>
           <option value="triangle">triangle</option>
           <option value="square">square</option>
         </select>
         <label>Detune</label>
-        <input type="range" min="-2400" max="2400" step="1" onChange={handleDetune} />
+        <input className="slider" value={settings.detune}  type="range" min="-2400" max="2400" step="1" onChange={handleDetune} />
         <label>Volume</label>
-        <input type="range" min="0" max="1" step="0.01" onChange={handleVolume} />
+        <input className="slider" value={settings.volume} type="range" min="0.01" max="1" step="0.01" onChange={handleVolume} />
         <label>Portamento</label>
-        <input type="range" min="0.01" max="0.8" step="0.001" onChange={handlePortamento} />
+        <input className="slider"  value = {settings.portamento} type="range" min="0.01" max="0.8" step="0.001" onChange={handlePortamento} />
 
       </div>
+    </fieldset>
 
-      <div className="control">
+      <fieldset className="control">
+        <legend>ADSR</legend>
         <label>Attack</label>
-        <input onChange={handleAttack} type="range" min="0" max="1" step="0.01" />
+        <input className="slider" value={settings.attack} onChange={handleAttack} type="range" min="0" max="1" step="0.01" />
         <label>Decay</label>
-        <input onChange={handleDecay} type="range" min="0" max="1" step="0.01" />
+        <input className="slider" value={settings.decay} onChange={handleDecay} type="range" min="0" max="1" step="0.01" />
         <label>Sustain</label>
-        <input onChange={handleSustain} type="range" min="0" max="1" step="0.01" />
+        <input className="slider" value={settings.sustain} onChange={handleSustain} type="range" min="0" max="1" step="0.01" />
         <label>Release</label>
-        <input onChange={handleRelease} type="range" min="0.1" max="5" step="0.01" />
-      </div>
+        <input className="slider" value={settings.release} onChange={handleRelease} type="range" min="0.1" max="5" step="0.01" />
+      </fieldset>
     </div>
   );
 }

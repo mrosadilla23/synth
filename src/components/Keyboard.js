@@ -60,11 +60,15 @@ const Keyboard = ({playSound, stop}) => {
       <div onMouseLeave={handleRelease} className="key black null"></div>
       <div onMouseLeave={handleRelease} className="key white">c</div>
     </div>
+
+
     <div className="octave">
       <label>Octave</label>
-      <button onClick={() => setOctave(octave - 1)}>-</button>
+      <div>
+      <button onClick={() => {if (octave > 0) setOctave(octave - 1)}}>-</button>
       <span>{octave}</span>
-      <button onClick={() => setOctave(octave + 1)}>+</button>
+      <button onClick={() => {if (octave < 8) setOctave(octave + 1)}}>+</button>
+      </div>
     </div>
     </>
   );

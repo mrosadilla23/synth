@@ -3,8 +3,7 @@ import Synth from "./Synth";
 
 const Body = () => {
   return (
-    <div>
-      <h1>Body</h1>
+    <div className="body">
       <Synth />
     </div>
   );

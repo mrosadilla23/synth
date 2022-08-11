@@ -1,14 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Keyboard from "./Keyboard";
 import Controls from "./Controls";
+import SavePreset from "./SavePreset";
+import PresetList from "./PresetList";
 
 
 function frequencyFromNoteNumber(note) {
   return 440 * Math.pow(2, (note - 69) / 12);
+
 }//defining symth function
+
+let midi = null;  // global  MIDIAccess object
+function onMIDISuccess(midiAccess) {
+  console.log("MIDI ready!");
+  midi = midiAccess;  // store in the global (in real usage, would probably keep in an object instance)
+}
+function onMIDIFailure(msg) {
+  console.error(`Failed to get MIDI access - ${msg}`);
+}
+navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
+
+const audio = new (AudioContext)();
+
+let currentNotes = {};
+let currentOsc = null;
+let noteCount = 0;
+let curentFreq = null;
+
 const Synth = () => {
-  const audio = new (AudioContext)();
-  let settings = {
+
+  const [midiEnabled, setMidiEnabled] = useState(false);
+  const [settings , setSettings ] = useState( {
     detune: 0,
     gain: 0.5,
     type: 'sine',
@@ -18,37 +40,44 @@ const Synth = () => {
     attack: 0.1,
     sustain: 0.2,
     decay: 0.5
-  };
+  })
   const handleWaveType = (e, o) => {
-    settings.type = e.target.value;
-    if (currentOsc) {
-      currentOsc.type = e.target.value;
-    }
+    graceFullStop();
+    setSettings({...settings, type: e.target.value});
   }
   const handleVolume = (e, o) => {
-    settings.volume = e.target.value;
-    //gain.gain.value = settings.volume;
+    graceFullStop();
+    setSettings({...settings, volume: +e.target.value});
+    if (currentOsc) {
+      currentOsc.volume.value = e.target.value;
+    };
   }
   const handleDetune = (e, o) => {
-    settings.detune = e.target.value;
+    graceFullStop();
+    setSettings({...settings, detune: +e.target.value});
     if (currentOsc) {
       currentOsc.detune.value = e.target.value;
-    }
+    };
   }
   const handlePortamento = (e) => {
-    settings.portamento = +e.target.value
-    }
+    graceFullStop();
+    setSettings({...settings, portamento: +e.target.value});
+  }
   const handleAttack = (e) => {
-    settings.attack = +e.target.value
-    }
+    graceFullStop();
+    setSettings({...settings, attack: +e.target.value});
+  }
   const handleDecay = (e) => {
-    settings.decay = +e.target.value
-    }
+    graceFullStop();
+    setSettings({...settings, decay: +e.target.value});
+  }
   const handleSustain = (e) => {
-    settings.sustain = +e.target.value
-    }
+    graceFullStop();
+    setSettings({...settings, sustain: +e.target.value});
+  }
   const handleRelease = (e) => {
-    settings.release = +e.target.value
+    graceFullStop();
+    setSettings({...settings, release: +e.target.value});
   }
   let playSound = (note) => {
     let attackEnd = audio.currentTime + settings.attack;
@@ -70,13 +99,13 @@ const Synth = () => {
     osc.start();
     return osc
   }
-  let gain =  null
+  let gain = null
 
 
   const graceFullStop = (osc) => {
-    gain.gain.setValueAtTime(gain.gain.value, audio.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.0000001, audio.currentTime + settings.release);
-    osc.stop( audio.currentTime + settings.release + 0.1 );
+    gain?.gain?.setValueAtTime(gain.gain.value, audio.currentTime);
+    gain?.gain?.exponentialRampToValueAtTime(0.0000001, audio.currentTime + settings.release);
+    osc?.stop(audio.currentTime + settings.release + 0.1);
     //gain.disconnect(audio.currentTime + 0.5);
 
   }
@@ -87,46 +116,26 @@ const Synth = () => {
 
 
   //defining midi function
-  let midi = null;  // global  MIDIAccess object
-  function onMIDISuccess(midiAccess) {
-    console.log("MIDI ready!");
-    midi = midiAccess;  // store in the global (in real usage, would probably keep in an object instance)
-  }
-  function onMIDIFailure(msg) {
-    console.error(`Failed to get MIDI access - ${msg}`);
-  }
-  navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
 
-  function listInputsAndOutputs(midiAccess) {
-    for (const entry of midiAccess.inputs) {
-      const input = entry[1];
-      console.log(`Input port [type:'${input.type}']` +
-        ` id:'${input.id}'` +
-        ` manufacturer:'${input.manufacturer}'` +
-        ` name:'${input.name}'` +
-        ` version:'${input.version}'`);
-    }
+  // let currentNotes = {};
+  // let currentOsc = null;
+  // let noteCount = 0;
+  // let curentFreq = null;
 
-    for (const entry of midiAccess.outputs) {
-      const output = entry[1];
-      console.log(`Output port [type:'${output.type}'] id:'${output.id}' manufacturer:'${output.manufacturer}' name:'${output.name}' version:'${output.version}'`);
-    }
-  }
-  let currentNotes = {};
-  let currentOsc = null;
-  let noteCount = 0;
-  let curentFreq = null;
+
   function onMIDIMessage(event) {
+    if (midiEnabled) {
     if (event.data[0] === 144) {
       if (noteCount === 0) {
-      let o = playSound(event.data[1]);
-      if (currentOsc) {
-        graceFullStop(currentOsc);
-      }
-      currentOsc = o;
+        let o = playSound(event.data[1]);
+        if (currentOsc) {
+          graceFullStop(currentOsc);
+        }
+        currentOsc = o;
 
-    } else {
-      currentOsc.frequency.exponentialRampToValueAtTime(frequencyFromNoteNumber(event.data[1]), audio.currentTime + +settings.portamento); }
+      } else {
+        currentOsc.frequency.exponentialRampToValueAtTime(frequencyFromNoteNumber(event.data[1]), audio.currentTime + +settings.portamento);
+      }
       currentNotes[event.data[1]] = true;
       noteCount++;
       curentFreq = frequencyFromNoteNumber(event.data[1]);
@@ -135,8 +144,8 @@ const Synth = () => {
       delete currentNotes[event.data[1]]
       let highest = Math.max(...Object.keys(currentNotes));
       if (highest !== -Infinity) {
-      currentOsc.frequency.exponentialRampToValueAtTime(frequencyFromNoteNumber(highest), audio.currentTime + +settings.portamento);
-      curentFreq = frequencyFromNoteNumber(highest);
+        currentOsc.frequency.exponentialRampToValueAtTime(frequencyFromNoteNumber(highest), audio.currentTime + +settings.portamento);
+        curentFreq = frequencyFromNoteNumber(highest);
       }
     } if (noteCount === 0) {
       if (currentOsc) {
@@ -153,24 +162,44 @@ const Synth = () => {
       currentOsc.frequency.value = oldFreq + newFreq;
     }
   }
-  function startLoggingMIDIInput(midiAccess, indexOfPort) {
-    midiAccess.inputs.forEach((entry) => { entry.onmidimessage = onMIDIMessage; });
+}
+  function stopLoggingMIDIInput(midiAccess, indexOfPort) {
+    midiAccess?.inputs?.forEach((entry) => {
+      if (entry) {
+      entry.onmidimessage = null} });
   }
+  function startLoggingMIDIInput(midiAccess, indexOfPort) {
+    midiAccess?.inputs?.forEach((entry) => {
+      entry.onmidimessage = onMIDIMessage; });
+  }
+
+  const [presets, setPresets] = useState([]);
   return (
     <div className="synth" >
-      <h1>Synth</h1>
-      <button onClick={() => startLoggingMIDIInput(midi, 0)}> Enable Midi</button>
-    <Controls
-      handleDetune={handleDetune}
-      handleWaveType={handleWaveType}
-      handleVolume={handleVolume}
-      handlePortamento={handlePortamento}
-      handleRelease = {handleRelease}
-      handleAttack={handleAttack}
-      handleDecay={handleDecay}
-      handleSustain={handleSustain}
-    />
-    <Keyboard playSound = {playSound} stop = {graceFullStop}/>
+      {stopLoggingMIDIInput(midi, 0)}
+      {startLoggingMIDIInput(midi, 0)}
+      <button onClick={() =>{
+        setMidiEnabled(!midiEnabled)
+        startLoggingMIDIInput(midi, 0)}}>MIDI<div className = {`light ${midiEnabled ? 'on' : 'off'}`}></div></button>
+      <SavePreset setPresets={setPresets} settings={settings} />
+      <Controls
+        midi={midi}
+        stopMidi = {stopLoggingMIDIInput}
+        startMidi = {startLoggingMIDIInput}
+        settings={settings}
+        setSettings={setSettings}
+        handleDetune={handleDetune}
+        handleWaveType={handleWaveType}
+        handleVolume={handleVolume}
+        handlePortamento={handlePortamento}
+        handleRelease={handleRelease}
+        handleAttack={handleAttack}
+        handleDecay={handleDecay}
+        handleSustain={handleSustain}
+      />
+      <Keyboard playSound={playSound} stop={graceFullStop} />
+
+      <PresetList presets={presets} setPresets={setPresets} stop={graceFullStop} setSettings={setSettings} />
     </div>
   );
 }
