@@ -1,9 +1,12 @@
 var db = require('../db');
 var express = require('express');
+const fs = require('fs');
+const https = require('https');
 var app = express();
 var port = process.env.PORT || 3000;
 var path = require('path');
 var bodyParser = require('body-parser')
+
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -11,7 +14,10 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-
+const options = {
+  key: fs.readFileSync(''),
+  cert: fs.readFileSync(''),
+};
 
 
 //serve the index.html file from the build directory

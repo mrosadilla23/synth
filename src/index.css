@@ -150,6 +150,7 @@ fieldset {
   font-display: none;
   border-radius: 2px;
 }
+
 .preset div:hover{
   background-color: gray;
 }
@@ -342,4 +343,13 @@ button:active {
   background: linear-gradient(90deg, rgba(255, 255, 255, 1) 49%, rgba(0, 0, 0, 1) 50%, rgba(255, 255, 255, 1) 51%);
   cursor: pointer;
   /* Cursor on hover */
+}
+select:focus {
+  box-shadow: none;
+  outline: none;
+}
+
+input:focus {
+  box-shadow: none;
+  outline: none;
 }
