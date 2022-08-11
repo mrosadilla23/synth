@@ -10,16 +10,16 @@ const Controls = ({midi,startMidi, stopMidi ,settings, setSettings , handleDetun
       <div>
         <label>WaveForm</label>
         <select value={settings.type} onChange={handleWaveType}>
-          <option value="sine">sine</option>
-          <option value="sawtooth">sawtooth</option>
-          <option value="triangle">triangle</option>
-          <option value="square">square</option>
+          <option value="sine">Sine</option>
+          <option value="sawtooth">Sawtooth</option>
+          <option value="triangle">Triangle</option>
+          <option value="square">Square</option>
         </select>
         <label>Detune</label>
         <input className="slider" value={settings.detune}  type="range" min="-2400" max="2400" step="1" onChange={handleDetune} />
         <label>Volume</label>
         <input className="slider" value={settings.volume} type="range" min="0.01" max="1" step="0.01" onChange={handleVolume} />
-        <label>Portamento</label>
+        <label>Glide</label>
         <input className="slider"  value = {settings.portamento} type="range" min="0.01" max="0.8" step="0.001" onChange={handlePortamento} />
 
       </div>
